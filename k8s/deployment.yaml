@@ -46,5 +46,5 @@ spec:
             cpu: 200m
             memory: 256Mi
         envFrom:
-        - configMapRef:
-            name: admin-ui-config
+        - secretRef:
+            name: admin-ui-secret

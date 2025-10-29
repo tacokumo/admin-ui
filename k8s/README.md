@@ -14,11 +14,17 @@ This directory contains Kubernetes manifests for deploying the Admin UI applicat
 
 Before deploying, update the following values:
 
-### ConfigMap (`configmap.yaml`)
-Update Auth0 configuration:
+### Secret (`secret.yaml`)
+Update Auth0 configuration (sensitive data stored in Secret):
 - `VITE_AUTH0_DOMAIN`: Your Auth0 domain
 - `VITE_AUTH0_CLIENT_ID`: Your Auth0 client ID
 - `VITE_AUTH0_AUDIENCE`: Your Auth0 API audience
+
+**Note**: In production, consider using external secret management solutions like:
+- Sealed Secrets
+- External Secrets Operator
+- HashiCorp Vault
+- AWS Secrets Manager / Azure Key Vault / GCP Secret Manager
 
 ### Ingress (`ingress.yaml`)
 - Update `host` to your domain
@@ -28,7 +34,7 @@ Update Auth0 configuration:
 ### Kustomization (`kustomization.yaml`)
 - Update `newName` with your Docker registry path
 - Update `newTag` with your desired image tag
-- Update `namespace` if deploying to a specific namespace
+- Namespace is set to `tacokumo` by default
 
 ## Building the Docker Image
 
@@ -50,25 +56,31 @@ docker push your-registry/admin-ui:latest
 ### Option 1: Using Kustomize (Recommended)
 
 ```bash
+# Create namespace first if it doesn't exist
+kubectl create namespace tacokumo
+
 # Deploy using kustomize
 kubectl apply -k k8s/
 
 # Verify deployment
-kubectl get all -l app=admin-ui
+kubectl get all -l app=admin-ui -n tacokumo
 
 # Check pods
-kubectl get pods -l app=admin-ui
+kubectl get pods -l app=admin-ui -n tacokumo
 ```
 
 ### Option 2: Using kubectl directly
 
 ```bash
+# Create namespace first
+kubectl create namespace tacokumo
+
 # Apply manifests individually
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-kubectl apply -f k8s/ingress.yaml
-kubectl apply -f k8s/hpa.yaml
+kubectl apply -f k8s/secret.yaml -n tacokumo
+kubectl apply -f k8s/deployment.yaml -n tacokumo
+kubectl apply -f k8s/service.yaml -n tacokumo
+kubectl apply -f k8s/ingress.yaml -n tacokumo
+kubectl apply -f k8s/hpa.yaml -n tacokumo
 ```
 
 ## Resources
@@ -102,19 +114,19 @@ kubectl apply -f k8s/hpa.yaml
 
 ```bash
 # Check deployment status
-kubectl rollout status deployment/admin-ui
+kubectl rollout status deployment/admin-ui -n tacokumo
 
 # View logs
-kubectl logs -l app=admin-ui --tail=100 -f
+kubectl logs -l app=admin-ui --tail=100 -f -n tacokumo
 
 # Describe deployment
-kubectl describe deployment admin-ui
+kubectl describe deployment admin-ui -n tacokumo
 
 # Check HPA status
-kubectl get hpa admin-ui
+kubectl get hpa admin-ui -n tacokumo
 
 # Check ingress
-kubectl get ingress admin-ui
+kubectl get ingress admin-ui -n tacokumo
 ```
 
 ## Updating the Deployment
@@ -124,46 +136,46 @@ kubectl get ingress admin-ui
 kubectl apply -k k8s/
 
 # Or use kubectl set image
-kubectl set image deployment/admin-ui admin-ui=your-registry/admin-ui:v1.2.3
+kubectl set image deployment/admin-ui admin-ui=your-registry/admin-ui:v1.2.3 -n tacokumo
 
 # Check rollout status
-kubectl rollout status deployment/admin-ui
+kubectl rollout status deployment/admin-ui -n tacokumo
 
 # Rollback if needed
-kubectl rollout undo deployment/admin-ui
+kubectl rollout undo deployment/admin-ui -n tacokumo
 ```
 
 ## Scaling
 
 ```bash
 # Manual scaling (will be overridden by HPA if enabled)
-kubectl scale deployment admin-ui --replicas=5
+kubectl scale deployment admin-ui --replicas=5 -n tacokumo
 
 # View HPA metrics
-kubectl get hpa admin-ui -w
+kubectl get hpa admin-ui -w -n tacokumo
 ```
 
 ## Troubleshooting
 
 ```bash
 # Check pod status
-kubectl get pods -l app=admin-ui
+kubectl get pods -l app=admin-ui -n tacokumo
 
 # Check pod logs
-kubectl logs <pod-name>
+kubectl logs <pod-name> -n tacokumo
 
 # Describe pod for events
-kubectl describe pod <pod-name>
+kubectl describe pod <pod-name> -n tacokumo
 
 # Execute into pod for debugging
-kubectl exec -it <pod-name> -- /bin/sh
+kubectl exec -it <pod-name> -n tacokumo -- /bin/sh
 
 # Check service endpoints
-kubectl get endpoints admin-ui
+kubectl get endpoints admin-ui -n tacokumo
 
 # Test service internally
-kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
-  curl http://admin-ui/health
+kubectl run -it --rm debug --image=curlimages/curl --restart=Never -n tacokumo -- \
+  curl http://admin-ui.tacokumo.svc.cluster.local/health
 ```
 
 ## Cleanup
