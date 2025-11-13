@@ -9,8 +9,8 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"preview": "vite preview",
-		"generate": "openapi2aspida -c aspida.config.cjs",
-		"generate:watch": "openapi2aspida  -c aspida.config.cjs --watch"
+		"generate": "rm -rf src/api/ && openapi2aspida -c aspida.config.cjs",
+		"generate:watch": "rm -rf src/api/ && openapi2aspida  -c aspida.config.cjs --watch"
 	},
 	"dependencies": {
 		"@aspida/axios": "^1.14.0",

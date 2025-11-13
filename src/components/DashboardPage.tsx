@@ -6,7 +6,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import LoadingPage from "./LoadingPage";
-import StatusPage from "./StatusPage";
 
 export default function DashboardPage() {
 	const { isLoading, isAuthenticated, error, user, logout } =
@@ -26,8 +25,6 @@ export default function DashboardPage() {
 	}
 
 	return (
-		<DashboardLayout isLoggedIn={isAuthenticated} onLogout={() => logout()}>
-            <StatusPage />
-		</DashboardLayout>
+		<DashboardLayout isLoggedIn={isAuthenticated} onLogout={() => logout()} />
 	);
 }

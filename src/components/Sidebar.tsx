@@ -1,48 +1,32 @@
 import { Stack, NavLink, useMantineColorScheme } from "@mantine/core";
 import {
-	IconDashboard,
 	IconSettings,
-	IconUsers,
-	IconDatabase,
+	IconFolder,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { PEPABO_BLUE, PEPABO_BLACK } from "../constants/colors";
 
-export function Sidebar() {
+interface SidebarProps {
+	onMenuClick?: (menuItem: string) => void;
+}
+
+export function Sidebar({ onMenuClick }: SidebarProps) {
 	const [active, setActive] = useState(0);
 	const { colorScheme } = useMantineColorScheme();
 
 	const categories = [
 		{
-			label: "ダッシュボード",
-			icon: IconDashboard,
+			label: "プロジェクト",
+			icon: IconFolder,
 			subcategories: [
-				{ label: "概要", value: "概要" },
-				{ label: "統計", value: "統計" },
+				{ label: "一覧", value: "プロジェクト一覧" },
 			],
 		},
 		{
-			label: "ユーザー管理",
-			icon: IconUsers,
-			subcategories: [
-				{ label: "ユーザー一覧", value: "ユーザー一覧" },
-				{ label: "ロール設定", value: "ロール設定" },
-			],
-		},
-		{
-			label: "データ管理",
-			icon: IconDatabase,
-			subcategories: [
-				{ label: "データベース", value: "データベース" },
-				{ label: "バックアップ", value: "バックアップ" },
-			],
-		},
-		{
-			label: "設定",
+			label: "その他",
 			icon: IconSettings,
 			subcategories: [
-				{ label: "システム設定", value: "システム設定" },
-				{ label: "セキュリティ", value: "セキュリティ" },
+				{ label: "APIサーバ", value: "APIサーバ" },
 			],
 		},
 	];
@@ -66,7 +50,10 @@ export function Sidebar() {
 							key={sub.value}
 							label={sub.label}
 							active={active === index * 10 + subIndex}
-							onClick={() => setActive(index * 10 + subIndex)}
+							onClick={() => {
+								setActive(index * 10 + subIndex);
+								onMenuClick?.(sub.value);
+							}}
 							style={{
 								color: active === index * 10 + subIndex ? PEPABO_BLUE : textColor,
 							}}
