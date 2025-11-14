@@ -1,1 +1,1 @@
-export { useAdminAPI } from './useAdminAPI';
+export { useAdminAPI } from "./useAdminAPI";

@@ -1,5 +1,5 @@
 import { Box, Button, Text } from "@mantine/core";
-import { PEPABO_BLUE, PEPABO_BLACK, PEPABO_WHITE } from "../constants/colors";
+import { PEPABO_BLACK, PEPABO_BLUE, PEPABO_WHITE } from "../constants/colors";
 
 interface LoginButtonProps {
 	onClick?: () => void;

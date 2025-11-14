@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react";
 import {
-	Container,
-	Title,
-	Text,
-	Card,
-	Group,
-	Stack,
-	Badge,
-	LoadingOverlay,
 	Alert,
+	Badge,
+	Card,
+	Container,
+	Group,
+	LoadingOverlay,
 	Pagination,
 	SimpleGrid,
+	Stack,
+	Text,
+	Title,
 } from "@mantine/core";
-import { IconAlertCircle, IconFolder, IconCalendar } from "@tabler/icons-react";
-import { useAdminAPI } from "../hooks/useAdminAPI";
+import { IconAlertCircle, IconCalendar, IconFolder } from "@tabler/icons-react";
+import { useCallback, useEffect, useState } from "react";
 import type { Project } from "../api/@types";
-import { PEPABO_BLUE, PEPABO_BLACK } from "../constants/colors";
+import { PEPABO_BLACK, PEPABO_BLUE } from "../constants/colors";
+import { useAdminAPI } from "../hooks/useAdminAPI";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -27,34 +27,41 @@ export function ProjectListPage() {
 	const [totalProjects, setTotalProjects] = useState(0);
 	const apiClient = useAdminAPI();
 
-	const fetchProjects = async (page: number) => {
-		try {
-			setLoading(true);
-			setError(null);
+	const fetchProjects = useCallback(
+		async (page: number) => {
+			try {
+				setLoading(true);
+				setError(null);
 
-			const offset = (page - 1) * ITEMS_PER_PAGE;
-			const response = await apiClient.v1alpha1.projects.$get({
-				query: {
-					limit: ITEMS_PER_PAGE,
-					offset: offset,
-				},
-			});
+				const offset = (page - 1) * ITEMS_PER_PAGE;
+				const response = await apiClient.v1alpha1.projects.$get({
+					query: {
+						limit: ITEMS_PER_PAGE,
+						offset: offset,
+					},
+				});
 
-			setProjects(response);
-			// Note: APIが総数を返さない場合は、レスポンスの長さで判定
-			// 実際のAPIでは総数を返すことが推奨されます
-			setTotalProjects(response.length === ITEMS_PER_PAGE ? offset + ITEMS_PER_PAGE + 1 : offset + response.length);
-		} catch (err) {
-			console.error("Failed to fetch projects:", err);
-			setError("プロジェクトの取得に失敗しました。");
-		} finally {
-			setLoading(false);
-		}
-	};
+				setProjects(response);
+				// Note: APIが総数を返さない場合は、レスポンスの長さで判定
+				// 実際のAPIでは総数を返すことが推奨されます
+				setTotalProjects(
+					response.length === ITEMS_PER_PAGE
+						? offset + ITEMS_PER_PAGE + 1
+						: offset + response.length,
+				);
+			} catch (err) {
+				console.error("Failed to fetch projects:", err);
+				setError("プロジェクトの取得に失敗しました。");
+			} finally {
+				setLoading(false);
+			}
+		},
+		[apiClient],
+	);
 
 	useEffect(() => {
 		fetchProjects(currentPage);
-	}, [currentPage, apiClient]);
+	}, [currentPage, fetchProjects]);
 
 	const formatDate = (dateString: string | undefined) => {
 		if (!dateString) return "不明";
@@ -104,7 +111,10 @@ export function ProjectListPage() {
 
 				{projects.length === 0 && !loading ? (
 					<Card withBorder p="xl" style={{ textAlign: "center" }}>
-						<IconFolder size={48} style={{ color: "var(--mantine-color-gray-5)" }} />
+						<IconFolder
+							size={48}
+							style={{ color: "var(--mantine-color-gray-5)" }}
+						/>
 						<Title order={3} mt="md" c="dimmed">
 							プロジェクトが見つかりません
 						</Title>
@@ -127,27 +137,34 @@ export function ProjectListPage() {
 											</Badge>
 										</Group>
 
-										{project.bio && (
+										{project.description && (
 											<Text size="sm" c="dimmed" lineClamp={2}>
-												{project.bio}
+												{project.description}
 											</Text>
 										)}
 
 										<Group gap="xs" mt="auto">
-											<IconCalendar size={14} style={{ color: "var(--mantine-color-gray-6)" }} />
+											<IconCalendar
+												size={14}
+												style={{ color: "var(--mantine-color-gray-6)" }}
+											/>
 											<Text size="xs" c="dimmed">
 												作成日: {formatDate(project.createdAt)}
 											</Text>
 										</Group>
 
-										{project.updatedAt && project.updatedAt !== project.createdAt && (
-											<Group gap="xs">
-												<IconCalendar size={14} style={{ color: "var(--mantine-color-gray-6)" }} />
-												<Text size="xs" c="dimmed">
-													更新日: {formatDate(project.updatedAt)}
-												</Text>
-											</Group>
-										)}
+										{project.updatedAt &&
+											project.updatedAt !== project.createdAt && (
+												<Group gap="xs">
+													<IconCalendar
+														size={14}
+														style={{ color: "var(--mantine-color-gray-6)" }}
+													/>
+													<Text size="xs" c="dimmed">
+														更新日: {formatDate(project.updatedAt)}
+													</Text>
+												</Group>
+											)}
 									</Stack>
 								</Card>
 							))}

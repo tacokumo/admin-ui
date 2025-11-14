@@ -1,4 +1,4 @@
-import { AppShell, Container, Box } from "@mantine/core";
+import { AppShell, Box, Container } from "@mantine/core";
 import { Footer } from "../components/Footer";
 
 interface LoginLayoutProps {
@@ -7,14 +7,13 @@ interface LoginLayoutProps {
 
 export function LoginLayout({ children }: LoginLayoutProps) {
 	return (
-		<AppShell
-			header={{ height: 60 }}
-			footer={{ height: 60 }}
-			padding="md"
-		>
-
+		<AppShell header={{ height: 60 }} footer={{ height: 60 }} padding="md">
 			<AppShell.Main>
-				<Container size="lg" px="md" style={{ minHeight: "calc(100vh - 120px)" }}>
+				<Container
+					size="lg"
+					px="md"
+					style={{ minHeight: "calc(100vh - 120px)" }}
+				>
 					<Box
 						style={{
 							display: "flex",
@@ -23,9 +22,7 @@ export function LoginLayout({ children }: LoginLayoutProps) {
 							minHeight: "100%",
 						}}
 					>
-						<Box style={{ width: "80%", maxWidth: "600px" }}>
-							{children}
-						</Box>
+						<Box style={{ width: "80%", maxWidth: "600px" }}>{children}</Box>
 					</Box>
 				</Container>
 			</AppShell.Main>

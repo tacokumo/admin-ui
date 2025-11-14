@@ -8,9 +8,8 @@ import { DashboardLayout } from "../layouts/DashboardLayout";
 import LoadingPage from "./LoadingPage";
 
 export default function DashboardPage() {
-	const { isLoading, isAuthenticated, error, user, logout } =
-		useAuth0();
-    const navigate = useNavigate();
+	const { isLoading, isAuthenticated, error, user, logout } = useAuth0();
+	const navigate = useNavigate();
 
 	if (isLoading) {
 		return <LoadingPage />;
@@ -20,8 +19,8 @@ export default function DashboardPage() {
 	}
 
 	if (!isAuthenticated || user === undefined) {
-        navigate("/login");
-        return null; // ナビゲーション後は何も表示しない
+		navigate("/login");
+		return null; // ナビゲーション後は何も表示しない
 	}
 
 	return (

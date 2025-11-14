@@ -1,7 +1,7 @@
-import { StrictMode } from "react";
-import { MantineProvider } from "@mantine/core";
-import { createRoot } from "react-dom/client";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { MantineProvider } from "@mantine/core";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./App.tsx";
 
@@ -14,18 +14,23 @@ const auth0Config = {
 
 // 必須の環境変数チェック
 const requiredEnvVars = [
-	{ key: 'VITE_AUTH0_DOMAIN', value: auth0Config.domain },
-	{ key: 'VITE_AUTH0_CLIENT_ID', value: auth0Config.clientId },
-	{ key: 'VITE_AUTH0_AUDIENCE', value: auth0Config.audience },
+	{ key: "VITE_AUTH0_DOMAIN", value: auth0Config.domain },
+	{ key: "VITE_AUTH0_CLIENT_ID", value: auth0Config.clientId },
+	{ key: "VITE_AUTH0_AUDIENCE", value: auth0Config.audience },
 ];
 
-const missingVars = requiredEnvVars.filter(env => !env.value);
+const missingVars = requiredEnvVars.filter((env) => !env.value);
 if (missingVars.length > 0) {
-	const missing = missingVars.map(env => env.key).join(', ');
+	const missing = missingVars.map((env) => env.key).join(", ");
 	throw new Error(`Missing required environment variables: ${missing}`);
 }
 
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+	throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
 	<StrictMode>
 		<Auth0Provider
 			domain={auth0Config.domain}

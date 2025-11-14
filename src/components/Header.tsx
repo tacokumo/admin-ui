@@ -1,10 +1,10 @@
 import {
+	Burger,
+	Button,
 	Group,
 	Switch,
 	Text,
 	useMantineColorScheme,
-	Burger,
-	Button,
 } from "@mantine/core";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 import { PEPABO_BLUE } from "../constants/colors";
@@ -16,7 +16,12 @@ interface HeaderProps {
 	onLogout?: () => void;
 }
 
-export function Header({ opened, toggle, isLoggedIn = false, onLogout }: HeaderProps) {
+export function Header({
+	opened,
+	toggle,
+	isLoggedIn = false,
+	onLogout,
+}: HeaderProps) {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
 	return (
