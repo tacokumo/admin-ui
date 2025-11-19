@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect } from "react";
 import { Autocomplete, Loader } from "@mantine/core";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "../api/@types";
 import { useAdminAPI } from "../hooks/useAdminAPI";
 
@@ -24,25 +24,28 @@ export function ProjectSelector({
 	const [userHasCleared, setUserHasCleared] = useState(false);
 	const apiClient = useAdminAPI();
 
+	const fetchProjectById = useCallback(
+		async (projectId: string) => {
+			try {
+				const project = await apiClient.v1alpha1.projects
+					._projectId(projectId)
+					.$get();
+				setSelectedProjectName(project.name);
+				setSearchValue(project.name);
+			} catch (error) {
+				console.error("Failed to fetch project by id:", error);
+			}
+		},
+		[apiClient],
+	);
+
 	// 初期値を設定（プロジェクトIDから名前を取得）
 	// ただし、ユーザーが明示的にクリアした場合は自動復元しない
 	useEffect(() => {
 		if (value && !selectedProjectName && !userHasCleared) {
-			fetchProjectById(value);
+			void fetchProjectById(value);
 		}
-	}, [value, selectedProjectName, userHasCleared]);
-
-	const fetchProjectById = async (projectId: string) => {
-		try {
-			const project = await apiClient.v1alpha1.projects
-				._projectId(projectId)
-				.$get();
-			setSelectedProjectName(project.name);
-			setSearchValue(project.name);
-		} catch (error) {
-			console.error("Failed to fetch project by id:", error);
-		}
-	};
+	}, [value, selectedProjectName, userHasCleared, fetchProjectById]);
 
 	const fetchProjects = async (query: string) => {
 		try {

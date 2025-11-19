@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import { IconAlertCircle, IconCalendar, IconFolder } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import type { Project } from "../api/@types";
 import { PEPABO_BLACK, PEPABO_BLUE } from "../constants/colors";
 import { useAdminAPI } from "../hooks/useAdminAPI";
@@ -26,6 +27,7 @@ export function ProjectListPage() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalProjects, setTotalProjects] = useState(0);
 	const apiClient = useAdminAPI();
+	const navigate = useNavigate();
 
 	const fetchProjects = useCallback(
 		async (page: number) => {
@@ -126,7 +128,14 @@ export function ProjectListPage() {
 					<>
 						<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
 							{projects.map((project) => (
-								<Card key={project.id} shadow="sm" padding="md" withBorder>
+								<Card
+									key={project.id}
+									shadow="sm"
+									padding="md"
+									withBorder
+									style={{ cursor: "pointer" }}
+									onClick={() => navigate(`/dashboard/projects/${project.id}`)}
+								>
 									<Stack gap="sm">
 										<Group justify="space-between">
 											<Text fw={600} size="lg" c={PEPABO_BLACK}>

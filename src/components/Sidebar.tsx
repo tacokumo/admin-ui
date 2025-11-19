@@ -1,57 +1,29 @@
 import { NavLink, Stack, useMantineColorScheme } from "@mantine/core";
-import {
-	IconFolder,
-	IconSettings,
-	IconShield,
-	IconUser,
-	IconUsers,
-} from "@tabler/icons-react";
-import { useState } from "react";
+import { IconFolder, IconSettings, IconUser } from "@tabler/icons-react";
+import { NavLink as RouterNavLink } from "react-router";
 import { PEPABO_BLACK, PEPABO_BLUE } from "../constants/colors";
-import { DashboardComponent } from "../layouts/DashboardLayout";
 
-interface SidebarProps {
-	onMenuClick?: (menuItem: DashboardComponent) => void;
-}
-
-export function Sidebar({ onMenuClick }: SidebarProps) {
-	const [active, setActive] = useState(0); // プロジェクト一覧を初期選択
+export function Sidebar() {
 	const { colorScheme } = useMantineColorScheme();
 
 	const categories = [
 		{
 			label: "プロジェクト",
 			icon: IconFolder,
-			subcategories: [
-				{ label: "一覧", value: DashboardComponent.PROJECT_LIST },
-			],
-		},
-		{
-			label: "ロール",
-			icon: IconShield,
-			subcategories: [{ label: "一覧", value: DashboardComponent.ROLE_LIST }],
-		},
-		{
-			label: "ユーザグループ",
-			icon: IconUsers,
-			subcategories: [
-				{ label: "一覧", value: DashboardComponent.USER_GROUP_LIST },
-			],
+			subcategories: [{ label: "一覧", path: "/dashboard/projects" }],
 		},
 		{
 			label: "ユーザー",
 			icon: IconUser,
 			subcategories: [
-				{ label: "一覧", value: DashboardComponent.USER_LIST },
-				{ label: "自身の情報", value: DashboardComponent.MY_PROFILE },
+				{ label: "一覧", path: "/dashboard/users" },
+				{ label: "自身の情報", path: "/dashboard/profile" },
 			],
 		},
 		{
 			label: "その他",
 			icon: IconSettings,
-			subcategories: [
-				{ label: "APIサーバ", value: DashboardComponent.API_SERVER },
-			],
+			subcategories: [{ label: "APIサーバ", path: "/dashboard/api-server" }],
 		},
 	];
 
@@ -69,20 +41,22 @@ export function Sidebar({ onMenuClick }: SidebarProps) {
 					defaultOpened={index === 0}
 					style={{ color: textColor }}
 				>
-					{category.subcategories.map((sub, subIndex) => (
-						<NavLink
-							key={sub.value}
-							label={sub.label}
-							active={active === index * 10 + subIndex}
-							onClick={() => {
-								setActive(index * 10 + subIndex);
-								onMenuClick?.(sub.value);
-							}}
-							style={{
-								color:
-									active === index * 10 + subIndex ? PEPABO_BLUE : textColor,
-							}}
-						/>
+					{category.subcategories.map((sub) => (
+						<RouterNavLink
+							key={sub.path}
+							to={sub.path}
+							style={{ textDecoration: "none" }}
+						>
+							{({ isActive }) => (
+								<NavLink
+									label={sub.label}
+									active={isActive}
+									style={{
+										color: isActive ? PEPABO_BLUE : textColor,
+									}}
+								/>
+							)}
+						</RouterNavLink>
 					))}
 				</NavLink>
 			))}
