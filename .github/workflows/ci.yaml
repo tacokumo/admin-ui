@@ -10,10 +10,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ui/admin
-
     steps:
     - uses: actions/checkout@v5
 
