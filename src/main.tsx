@@ -5,25 +5,26 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./App.tsx";
 
-// 環境変数のバリデーション
-const auth0Config = {
-	domain: import.meta.env.VITE_AUTH0_DOMAIN,
-	clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
-	audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+// 実行時環境変数を取得（本番環境）またはビルド時環境変数を取得（開発環境）
+const getEnvVar = (key: keyof NonNullable<typeof window.ENV>): string => {
+	// 本番環境: window.ENVから取得
+	if (window.ENV?.[key]) {
+		return window.ENV[key];
+	}
+	// 開発環境: import.meta.envから取得
+	const devValue = import.meta.env[key];
+	if (devValue) {
+		return devValue;
+	}
+	throw new Error(`Missing required environment variable: ${key}`);
 };
 
-// 必須の環境変数チェック
-const requiredEnvVars = [
-	{ key: "VITE_AUTH0_DOMAIN", value: auth0Config.domain },
-	{ key: "VITE_AUTH0_CLIENT_ID", value: auth0Config.clientId },
-	{ key: "VITE_AUTH0_AUDIENCE", value: auth0Config.audience },
-];
-
-const missingVars = requiredEnvVars.filter((env) => !env.value);
-if (missingVars.length > 0) {
-	const missing = missingVars.map((env) => env.key).join(", ");
-	throw new Error(`Missing required environment variables: ${missing}`);
-}
+// 環境変数のバリデーション
+const auth0Config = {
+	domain: getEnvVar("VITE_AUTH0_DOMAIN"),
+	clientId: getEnvVar("VITE_AUTH0_CLIENT_ID"),
+	audience: getEnvVar("VITE_AUTH0_AUDIENCE"),
+};
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

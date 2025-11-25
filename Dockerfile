@@ -13,23 +13,14 @@ RUN npm ci --only=production=false
 # Copy source code
 COPY . .
 
-# ビルド時環境変数を受け取る
-ARG VITE_AUTH0_DOMAIN
-ARG VITE_AUTH0_CLIENT_ID
-ARG VITE_AUTH0_AUDIENCE
-ARG VITE_API_BASE_URL
-
-# 環境変数をセット（ビルド時に使用される）
-ENV VITE_AUTH0_DOMAIN=$VITE_AUTH0_DOMAIN
-ENV VITE_AUTH0_CLIENT_ID=$VITE_AUTH0_CLIENT_ID
-ENV VITE_AUTH0_AUDIENCE=$VITE_AUTH0_AUDIENCE
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-
-# Build the application
+# Build the application (no environment variables needed at build time)
 RUN npm run build
 
 # Production stage
 FROM nginx:alpine AS production
+
+# Install gettext for envsubst
+RUN apk add --no-cache gettext
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
@@ -37,8 +28,13 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy nginx configuration for SPA routing
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Expose port 80
 EXPOSE 80
 
-# Start nginx
+# Use custom entrypoint
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

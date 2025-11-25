@@ -13,9 +13,11 @@ export const useAdminAPI = () => {
 	const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
 	const apiClient = useMemo(() => {
-		// Base URL for the API - you might want to make this configurable via environment variables
+		// Base URL for the API - 実行時環境変数（本番）またはビルド時環境変数（開発）から取得
 		const baseURL =
-			import.meta.env.VITE_API_BASE_URL || "http://admin.example.com/";
+			window.ENV?.VITE_API_BASE_URL ||
+			import.meta.env.VITE_API_BASE_URL ||
+			"http://admin.example.com/";
 
 		// Create axios instance with interceptor for auth headers
 		const axiosInstance = axios.create({
